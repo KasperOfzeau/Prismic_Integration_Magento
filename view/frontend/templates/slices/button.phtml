@@ -1,0 +1,23 @@
+<?php
+/**
+ * @var $block \Magento\Framework\View\Element\Template
+ * @var $escaper \Magento\Framework\Escaper
+ * @var $block \Magento\Framework\View\Element\Template
+ */
+
+$sliceBlock = $block->getData('slice');
+$text = $sliceBlock->getText();
+$link = $sliceBlock->getLink();
+$color = $sliceBlock->getColor();
+
+if(!empty($text) && !empty($link->url) && !empty($color)):
+?>
+    <section class="flex justify-center items-center my-6 md:my-9">
+        <a class="button <?= $color == "Orange"? "bg-orange" : "bg-green" ?>
+           href=" <?= $escaper->escapeHtmlAttr($link->url) ?>"><?= $escaper->escapeHtml($text) ?>
+        </a>
+    </section>
+<?php
+endif;
+?>
+

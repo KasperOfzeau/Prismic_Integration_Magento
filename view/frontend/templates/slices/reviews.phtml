@@ -1,0 +1,58 @@
+<?php
+use Prismic\Dom\RichText;
+
+/**
+ * @var $block \Magento\Framework\View\Element\Template
+ * @var $reviewsModel \Marleen\PrismicIntegration\ViewModel\Reviews
+ * @var $linkResolver \Marleen\PrismicIntegration\ViewModel\LinkResolver
+ * @var $htmlSerializerModel \Marleen\PrismicIntegration\ViewModel\HtmlSerializer
+ * @var $escaper \Magento\Framework\Escaper
+ * @var $block \Magento\Framework\View\Element\Template
+ */
+
+$sliceBlock = $block->getData('slice');
+$title = $sliceBlock->getTitle();
+$backgroundImage = $sliceBlock->getBackgroundImage();
+$reviewsIds = $sliceBlock->getReviews();
+
+$reviewsModel = $block->getData('reviewsModel');
+$reviews = $reviewsModel->getReviews($reviewsIds);
+
+$linkResolver = $block->getData("linkResolver");
+
+$htmlSerializerModel = $block->getData("htmlSerializer");
+$htmlSerializer = $htmlSerializerModel->getSerializerFunction();
+
+if(!empty($title) && !empty($backgroundImage->url) && !empty($reviews)):
+?>
+    <section>
+        <h2 class="text-center text-3xl mb-7 mt-14"><?= $escaper->escapeHtml($title) ?></h2>
+    </section>
+    <section
+        class="my-6 md:my-9 max-w-[1266px] mx-auto bg-cover bg-center bg-no-repeat"
+        style="background-image: url('<?= $escaper->escapeHtmlAttr($backgroundImage->url) ?>')"
+    >
+        <div class="py-20 gap-y-14 mx-auto w-full max-w-6xl flex flex-row flex-wrap justify-center md:justify-between">
+            <?php
+            // Check if the results are present and is an array
+            if (isset($reviews->results) && is_array($reviews->results)):
+                foreach ($reviews->results as $review):?>
+                    <div
+                        class="bg-white text-brown text-lg text-center py-8 px-5 h-[250px] md:h-[360px] w-[250px] md:min-w-350 max-w-350 flex items-center justify-center"
+                    >
+                        <div>
+                            <p class="text-base md:text-lg"><?= $escaper->escapeHtml($review->data->author) ?></p>
+                            <p>
+                                <?= RichText::asHtml($review->data->text, $linkResolver, $htmlSerializer) ?>
+                            </p>
+                        </div>
+                    </div>
+                <?php
+                endforeach;
+             endif;
+             ?>
+        </div>
+    </section>
+<?php
+endif;
+?>

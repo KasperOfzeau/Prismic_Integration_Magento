@@ -1,0 +1,26 @@
+<?php
+/**
+ * @var $block \Magento\Framework\View\Element\Template
+ * @var $escaper \Magento\Framework\Escaper
+ * @var $block \Magento\Framework\View\Element\Template
+ */
+
+$sliceBlock = $block->getData('slice');
+$icon = $sliceBlock->getIcon();
+$title = $sliceBlock->getTitle();
+
+if(!empty($icon->url) && !empty($title)):
+?>
+    <section class="px-6 my-6 md:my-9">
+        <div class="mt-24 py-12 px-16 bg-green-light mx-auto w-full max-w-6xl flex flex-col content-center items-center flex-wrap">
+                <img src="<?= $escaper->escapeHtmlAttr($icon->url) ?>" alt="Icon" class="mt-[-100px] mx-auto mb-5 h-[100px]" />
+            <h2 class="text-center text-3xl mb-3"><?= $escaper->escapeHtml($title) ?></h2>
+            <form class="pt-5 w-fit flex flex-col md:flex-row justify-center md:justify-between content-center">
+                <input type="email" class="placeholder:text-black h-[36px] px-3 md:mr-3" placeholder="Jouw e-mailadres" />
+                <button class="mt-5 md:mt-0 button bg-green">Aanmelden</button>
+            </form>
+        </div>
+    </section>
+<?php
+endif;
+?>

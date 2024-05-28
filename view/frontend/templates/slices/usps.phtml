@@ -1,0 +1,41 @@
+<?php
+use Prismic\Dom\RichText;
+
+/**
+ * @var $block \Magento\Framework\View\Element\Template
+ * @var $linkResolver \Marleen\PrismicIntegration\ViewModel\LinkResolver
+ * @var $htmlSerializerModel \Marleen\PrismicIntegration\ViewModel\HtmlSerializer
+ * @var $escaper \Magento\Framework\Escaper
+ * @var $block \Magento\Framework\View\Element\Template
+ */
+
+$sliceBlock = $block->getData('slice');
+$title = $sliceBlock->getTitle();
+$items = $sliceBlock->getUsps();
+
+$linkResolver = $block->getData("linkResolver");
+
+$htmlSerializerModel = $block->getData("htmlSerializer");
+$htmlSerializer = $htmlSerializerModel->getSerializerFunction();
+
+if(!empty($title) && !empty($items)):
+?>
+<section>
+    <h2 class="text-center text-3xl mb-7 mt-14"><?= $escaper->escapeHtml($title) ?></h2>
+</section>
+<section class="px-6 my-6 md:my-9">
+    <div class="mx-auto w-full max-w-6xl flex flex-wrap flex-row justify-center md:justify-between">
+        <?php foreach ($items as $index => $item): ?>
+        <div class="text-lg max-w-350 max-h-350 py-6 md:py-11 px-8">
+            <?php if (!empty($item->icon->url)): ?>
+                <img src="<?= $escaper->escapeHtmlAttr($item->icon->url) ?>" alt="Icon" class="h-16 mx-auto mb-5">
+            <?php endif; ?>
+            <h3 class="text-2xl mb-3 mt-10"><?= $escaper->escapeHtml($item->title) ?></h3>
+            <div class="text-base"><?= RichText::asHtml($item->text, $linkResolver, $htmlSerializer) ?></div>
+        </div>
+        <?php endforeach; ?>
+    </div>
+</section>
+<?php
+endif;
+?>

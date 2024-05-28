@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    @apply overflow-x-hidden antialiased;
+    background-color: #EEEEEE;
+}
+
+[data-collapsible="true"].bg-white + [data-collapsible="true"].bg-white {
+    @apply pt-0 md:pt-0;
+}
+
+.button {
+    @apply text-white text-base text-center font-bold no-underline normal-case leading-loose outline-none px-2.5;
+}
+
+.title-shadow {
+    text-shadow: 1px 1px 4px rgba(0,0,0,.7);
+}

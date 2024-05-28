@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="marleen-top-none" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Marleen_PrismicIntegration::css/output.css" />
+        <title>Your Default Title</title>
+    </head>
+    <body>
+        <referenceContainer name="main">
+            <block name="prismic.content" template="Marleen_PrismicIntegration::prismic.phtml">
+                <arguments>
+                    <argument xsi:type="object" name="prismicModel">\Marleen\PrismicIntegration\ViewModel\Prismic</argument>
+                    <argument xsi:type="object" name="slug">\Marleen\PrismicIntegration\ViewModel\Slug</argument>
+                    <argument xsi:type="object" name="apiModel">\Marleen\PrismicIntegration\ViewModel\Api</argument>
+                </arguments>
+                <block name="slices.hero" template="Marleen_PrismicIntegration::slices/hero.phtml"/>
+                <block name="slices.button" template="Marleen_PrismicIntegration::slices/button.phtml"/>
+                <block name="slices.cta" template="Marleen_PrismicIntegration::slices/cta.phtml"/>
+                <block name="slices.reviews" template="Marleen_PrismicIntegration::slices/reviews.phtml">
+                    <arguments>
+                        <argument xsi:type="object" name="reviewsModel">\Marleen\PrismicIntegration\ViewModel\Reviews</argument>
+                        <argument xsi:type="object" name="linkResolver">\Marleen\PrismicIntegration\ViewModel\LinkResolver</argument>
+                        <argument xsi:type="object" name="htmlSerializer">\Marleen\PrismicIntegration\ViewModel\HtmlSerializer</argument>
+                    </arguments>
+                </block>
+                <block name="slices.steps" template="Marleen_PrismicIntegration::slices/steps.phtml">
+                    <arguments>
+                        <argument xsi:type="object" name="linkResolver">\Marleen\PrismicIntegration\ViewModel\LinkResolver</argument>
+                        <argument xsi:type="object" name="htmlSerializer">\Marleen\PrismicIntegration\ViewModel\HtmlSerializer</argument>
+                    </arguments>
+                </block>
+                <block name="slices.titleWithText" template="Marleen_PrismicIntegration::slices/titleWithText.phtml">
+                    <arguments>
+                        <argument xsi:type="object" name="linkResolver">\Marleen\PrismicIntegration\ViewModel\LinkResolver</argument>
+                        <argument xsi:type="object" name="htmlSerializer">\Marleen\PrismicIntegration\ViewModel\HtmlSerializer</argument>
+                    </arguments>
+                </block>
+                <block name="slices.usps" template="Marleen_PrismicIntegration::slices/usps.phtml">
+                    <arguments>
+                        <argument xsi:type="object" name="linkResolver">\Marleen\PrismicIntegration\ViewModel\LinkResolver</argument>
+                        <argument xsi:type="object" name="htmlSerializer">\Marleen\PrismicIntegration\ViewModel\HtmlSerializer</argument>
+                    </arguments>
+                </block>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

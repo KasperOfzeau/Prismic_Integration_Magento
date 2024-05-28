@@ -1,0 +1,34 @@
+<?php
+use Prismic\Dom\RichText;
+
+/**
+ * @var $block \Magento\Framework\View\Element\Template
+ * @var $linkResolver \Marleen\PrismicIntegration\ViewModel\LinkResolver
+ * @var $htmlSerializerModel \Marleen\PrismicIntegration\ViewModel\HtmlSerializer
+ * @var $escaper \Magento\Framework\Escaper
+ * @var $block \Magento\Framework\View\Element\Template
+ */
+
+$sliceBlock = $block->getData('slice');
+$items = $sliceBlock->getTexts();
+
+$linkResolver = $block->getData("linkResolver");
+
+$htmlSerializerModel = $block->getData("htmlSerializer");
+$htmlSerializer = $htmlSerializerModel->getSerializerFunction();
+
+if(!empty($items)):
+?>
+    <section class="md:px-6 my-6 md:my-9">
+        <div class="text-block bg-white shadow-card py-12 px-8 md:px-16 mx-auto w-full max-w-6xl">
+            <?php foreach ($items as $index => $item): ?>
+                <div <?php echo $index !== count($items) - 1 ? 'class="mb-9"' : ''; ?>>
+                    <h2 class="text-center text-3xl mb-3"><?= $escaper->escapeHtml($item->title) ?></h2>
+                    <?= RichText::asHtml($item->text, $linkResolver, $htmlSerializer) ?>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </section>
+<?php
+endif;
+?>

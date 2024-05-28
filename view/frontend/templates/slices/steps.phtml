@@ -1,0 +1,39 @@
+<?php
+use Prismic\Dom\RichText;
+
+/**
+ * @var $block \Magento\Framework\View\Element\Template
+ * @var $linkResolver \Marleen\PrismicIntegration\ViewModel\LinkResolver
+ * @var $htmlSerializerModel \Marleen\PrismicIntegration\ViewModel\HtmlSerializer
+ * @var $escaper \Magento\Framework\Escaper
+ * @var $block \Magento\Framework\View\Element\Template
+ */
+
+$sliceBlock = $block->getData('slice');
+$steps = $sliceBlock->getSteps();
+
+$linkResolver = $block->getData("linkResolver");
+
+$htmlSerializerModel = $block->getData("htmlSerializer");
+$htmlSerializer = $htmlSerializerModel->getSerializerFunction();
+
+if(!empty($steps)):
+?>
+
+    <section class="container px-6 my-6 md:my-9">
+        <div class="mx-auto w-full max-w-6xl flex flex-row flex-wrap justify-center md:justify-between">
+            <?php foreach ($steps as $item): ?>
+                <div class="shadow-card bg-white text-lg mt-16 py-11 px-7 text-center min-w-350 md:max-w-350">
+                    <img src="<?= $escaper->escapeHtml($item->icon->url) ?>" alt="Icon" class="h-16 mx-auto mb-7 mt-[-75px]">
+                    <h3 class="text-center text-green text-2xl mb-3"><?= $escaper->escapeHtml($item->title) ?></h3>
+                    <div class="text-lg">
+                        <?= RichText::asHtml($item->text, $linkResolver, $htmlSerializer) ?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </section>
+<?php
+endif;
+?>
+
