@@ -10,6 +10,8 @@ API connection between Prismic and Magento
 - [Slug ViewModel](#slug-viewmodel)
 - [Title ViewModel](#title-viewmodel)
 - [Layout XML](#layout-xml)
+- [Prismic Template](#prismic-template)
+- [Slice Template](#slice-template)
 - [Contributing](#contributing)
 
 ## Installation
@@ -373,7 +375,60 @@ The following PHP template file is responsible for fetching content from the Pri
   - Fetch the document from the Prismic API using the slug.
   - Extract slices from the document data.
   - Display the slices using the `displaySlices` method of the Prismic model.
+ 
+## Slice Template
 
+This PHP template file is used to render a hero slice within a Magento storefront. It includes a background image, a text heading, and optionally a button if the slice variation is 'heroWithButton'. The template ensures proper escaping of HTML attributes and content to enhance security. This is just an example of all the slices
+
+### Explanation
+
+1. **Variable Declarations**: The template starts with variable declarations for the block, escaper, and slice interface.
+
+```php
+/**
+ * @var $block \Magento\Framework\View\Element\Template
+ * @var $escaper \Magento\Framework\Escaper
+ * @var $slice Marleen\PrismicIntegration\Model\Slices\HeroSliceInterface
+ */
+```
+
+2. **Retrieve Slice Block Data**: The slice block data is retrieved from the block, including text, background image, variation, button text, and button link.
+
+```php
+$sliceBlock = $block->getData('slice');
+$text = $sliceBlock->getText();
+$background = $sliceBlock->getBackgroundImage();
+$variation = $block->getData('blockVariation');
+$buttonText = $sliceBlock->getButtonText();
+$buttonLink = $sliceBlock->getButtonLink();
+```
+
+3. **Conditional Rendering**: The template checks if the background image URL and text are not empty before rendering the section.
+
+```php
+if (!empty($background->url) && !empty($text)):
+```
+
+4. **HTML Structure**: The HTML structure includes a section with a background image, a centered text heading, and an optional button if the variation is 'heroWithButton'.
+
+```php
+<section class="relative">
+    <figure class="absolute inset-0">
+        <img src="<?= $escaper->escapeHtmlAttr($background->url) ?>" class="pointer-events-none select-none object-cover h-[300px] md:h-full w-full" alt="">
+    </figure>
+    <div class="relative flex justify-center bg-hero w-full">
+        <div class="flex flex-col justify-end items-end h-[300px] md:h-[500px]">
+            <h2 class="text-white max-w-[1126px] text-3xl md:text-7xl text-center title-shadow mb-5 mx-10 md:mx-20"><?= $escaper->escapeHtml($text) ?></h2>
+            <?php if ($variation == 'heroWithButton' && !empty($buttonText) && !empty($buttonLink)): ?>
+                <a class="button mb-5 mx-auto" href="<?= $escaper->escapeHtmlAttr($buttonLink->url) ?>">
+                    <?= $escaper->escapeHtml($buttonText) ?>
+                </a>
+            <?php endif; ?>
+        </div>
+    </div>
+</section>
+```
+    
 ## Contributing
 [Kasper Beljaars](https://github.com/KasperOfzeau)
 
