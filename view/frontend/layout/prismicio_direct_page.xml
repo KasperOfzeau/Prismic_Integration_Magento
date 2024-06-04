@@ -2,22 +2,30 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="marleen-top-none" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <head>
         <css src="Marleen_PrismicIntegration::css/output.css" />
-        <title>Your Default Title</title>
     </head>
     <body>
+        <referenceContainer name="page.wrapper">
+            <block name="header.usps" template="Marleen_PrismicIntegration::header/usps.phtml" before="header.content">
+                <arguments>
+                    <argument name="uspsModel" xsi:type="object">\Marleen\PrismicIntegration\ViewModel\Usps</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
         <referenceContainer name="main">
+            <block name="page.title" class="Elgentos\PrismicIO\Block\Layout\PageTitle">
+                <block class="Elgentos\PrismicIO\Block\Dom\Text" template="data.title"/>
+            </block>
             <block name="prismic.content" template="Marleen_PrismicIntegration::prismic.phtml">
                 <arguments>
                     <argument xsi:type="object" name="prismicModel">\Marleen\PrismicIntegration\ViewModel\Prismic</argument>
-                    <argument xsi:type="object" name="slug">\Marleen\PrismicIntegration\ViewModel\Slug</argument>
-                    <argument xsi:type="object" name="apiModel">\Marleen\PrismicIntegration\ViewModel\Api</argument>
+                    <argument xsi:type="object" name="documentModel">\Marleen\PrismicIntegration\ViewModel\Document</argument>
                 </arguments>
                 <block name="slices.hero" template="Marleen_PrismicIntegration::slices/hero.phtml"/>
                 <block name="slices.button" template="Marleen_PrismicIntegration::slices/button.phtml"/>
                 <block name="slices.cta" template="Marleen_PrismicIntegration::slices/cta.phtml"/>
                 <block name="slices.reviews" template="Marleen_PrismicIntegration::slices/reviews.phtml">
                     <arguments>
-                        <argument xsi:type="object" name="reviewsModel">\Marleen\PrismicIntegration\ViewModel\Reviews</argument>
+                        <argument xsi:type="object" name="customTypeModel">\Marleen\PrismicIntegration\ViewModel\CustomType</argument>
                         <argument xsi:type="object" name="linkResolver">\Marleen\PrismicIntegration\ViewModel\LinkResolver</argument>
                         <argument xsi:type="object" name="htmlSerializer">\Marleen\PrismicIntegration\ViewModel\HtmlSerializer</argument>
                     </arguments>

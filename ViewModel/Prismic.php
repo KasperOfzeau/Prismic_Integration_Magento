@@ -4,64 +4,22 @@ namespace Marleen\PrismicIntegration\ViewModel;
 
 use Magento\Framework\View\Element\Block\ArgumentInterface;
 use Magento\Framework\View\LayoutInterface;
-use Marleen\PrismicIntegration\Model\Slices\ButtonSliceInterface;
-use Marleen\PrismicIntegration\Model\Slices\CtaSliceInterface;
-use Marleen\PrismicIntegration\Model\Slices\HeroSliceInterface;
-use Marleen\PrismicIntegration\Model\Slices\ReviewsSliceInterface;
-use Marleen\PrismicIntegration\Model\Slices\StepsSliceInterface;
-use Marleen\PrismicIntegration\Model\Slices\TitleWithTextSliceInterface;
-use Marleen\PrismicIntegration\Model\Slices\UspsSliceInterface;
 
 class Prismic implements ArgumentInterface
 {
     protected LayoutInterface $layout;
+    protected SliceMap $sliceMap;
 
     /**
      * Prismic constructor.
      *
      * @param LayoutInterface $layout
+     * @param SliceMap $sliceMap
      */
-    public function __construct(LayoutInterface $layout)
+    public function __construct(LayoutInterface $layout, SliceMap $sliceMap)
     {
         $this->layout = $layout;
-    }
-
-    // Map slice types to their corresponding block names and attributes for rendering
-    protected function getSliceMap(): array
-    {
-        return [
-            HeroSliceInterface::TYPE => [
-                'blockName' => HeroSliceInterface::BLOCK_NAME,
-                'attributes' => HeroSliceInterface::DEFAULT,
-                'heroWithButton' => [
-                    'attributes' => HeroSliceInterface::HEROWITHBUTTON,
-                ]
-            ],
-            ButtonSliceInterface::TYPE => [
-                'blockName' => ButtonSliceInterface::BLOCK_NAME,
-                'attributes' => ButtonSliceInterface::ATTRIBUTES
-            ],
-            CtaSliceInterface::TYPE => [
-                'blockName' => CtaSliceInterface::BLOCK_NAME,
-                'attributes' => CtaSliceInterface::ATTRIBUTES
-            ],
-            ReviewsSliceInterface::TYPE => [
-                'blockName' => ReviewsSliceInterface::BLOCK_NAME,
-                'attributes' => ReviewsSliceInterface::ATTRIBUTES
-            ],
-            StepsSliceInterface::TYPE => [
-                'blockName' => StepsSliceInterface::BLOCK_NAME,
-                'attributes' => StepsSliceInterface::ATTRIBUTES
-            ],
-            TitleWithTextSliceInterface::TYPE => [
-                'blockName' => TitleWithTextSliceInterface::BLOCK_NAME,
-                'attributes' => TitleWithTextSliceInterface::ATTRIBUTES
-            ],
-            UspsSliceInterface::TYPE => [
-                'blockName' => UspsSliceInterface::BLOCK_NAME,
-                'attributes' => UspsSliceInterface::ATTRIBUTES
-            ],
-        ];
+        $this->sliceMap = $sliceMap;
     }
 
     /**
@@ -74,7 +32,7 @@ class Prismic implements ArgumentInterface
     public function displaySlices(array $slices, $block): string
     {
         $htmlOutput = '';
-        $sliceMap = $this->getSliceMap();
+        $sliceMap = $this->sliceMap->getSliceMap();
 
         foreach ($slices as $slice) {
             $type = $slice->slice_type;
@@ -141,9 +99,7 @@ class Prismic implements ArgumentInterface
             $value = $slice->primary->{$attribute} ?? '';
 
             if ($attribute === 'reviews') {
-                $value = array_map(fn($item) => $item->review->id, $slice->items);
-            } elseif (in_array($attribute, ['steps', 'texts', 'usps'])) {
-                $value = $slice->items;
+                $value = array_map(fn($item) => $item->review->id, $slice->primary->reviews);
             }
 
             $attribute = $this->camelCaseToSnakeCase($attribute);
@@ -158,7 +114,7 @@ class Prismic implements ArgumentInterface
      * @param string $variation
      * @param mixed $childBlock
      */
-    protected function setVariation(string $variation, $childBlock): void
+    protected function setVariation(string $variation, mixed $childBlock): void
     {
         $childBlock->setData('blockVariation', $variation);
     }

@@ -1,27 +1,18 @@
 <?php
-
 /**
  * @var $block \Magento\Framework\View\Element\Template
- * @var $apiModel \Marleen\PrismicIntegration\ViewModel\Api
  * @var $prismicModel \Marleen\PrismicIntegration\ViewModel\Prismic
- * @var $slugModel \Marleen\PrismicIntegration\ViewModel\Slug
+ * @var $documentModel \Marleen\PrismicIntegration\ViewModel\Document
  */
 
-// Retrieve the Prismic API model from the block's data
-$apiModel = $block->getData('apiModel');
-// Get the Prismic API instance from the API model
-$api = $apiModel->getApi();
-
-// Retrieve the Slug model from the block's data
-$slugModel = $block->getData('slug');
-// Get the slug from the Slug model
-$slug = $slugModel->getSlug();
-
-// Fetch the document from the Prismic API using the slug
-$document = $api->getByUID('page', $slug);
-// Extract slices from the document data, if available
-$slices = $document->data->slices ?? [];
-
-$prismicModel = $block->getData('prismicModel');
-// Display the slices using the Prismic model's displaySlices method
-echo $prismicModel->displaySlices($slices, $block);
+// Get documentModel
+$documentModel = $block->getData('documentModel');
+// Get document from Elgentos module
+$document = $documentModel->getDocument();
+if ($document !== null) {
+    // Get slices from document
+    $slices = $document->data->slices ?? [];
+    $prismicModel = $block->getData('prismicModel');
+    // Display the slices using the Prismic model's displaySlices method
+    echo $prismicModel->displaySlices($slices, $block);
+}

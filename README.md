@@ -7,11 +7,12 @@ API connection between Prismic and Magento
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Prismic ViewModel](#prismic-viewmodel)
-- [Slug ViewModel](#slug-viewmodel)
-- [Title ViewModel](#title-viewmodel)
+- [SliceMap ViewModel](#slicemap-viewmodel)
 - [Layout XML](#layout-xml)
 - [Prismic Template](#prismic-template)
 - [Slice Template](#slice-template)
+- [CustomType ViewModel](#customtype-viewmodel)
+- [Usps ViewModel](#usps-viewmodel)
 - [Contributing](#contributing)
 
 ## Installation
@@ -47,13 +48,6 @@ namespace Marleen\PrismicIntegration\ViewModel;
 
 use Magento\Framework\View\Element\Block\ArgumentInterface;
 use Magento\Framework\View\LayoutInterface;
-use Marleen\PrismicIntegration\Model\Slices\ButtonSliceInterface;
-use Marleen\PrismicIntegration\Model\Slices\CtaSliceInterface;
-use Marleen\PrismicIntegration\Model\Slices\HeroSliceInterface;
-use Marleen\PrismicIntegration\Model\Slices\ReviewsSliceInterface;
-use Marleen\PrismicIntegration\Model\Slices\StepsSliceInterface;
-use Marleen\PrismicIntegration\Model\Slices\TitleWithTextSliceInterface;
-use Marleen\PrismicIntegration\Model\Slices\UspsSliceInterface;
 ```
 
 ### Properties
@@ -107,29 +101,6 @@ public function displaySlices(array $slices, $block): string
 }
 ```
 
-#### `getSliceMap`
-
-This protected method maps slice types to their corresponding block names and attributes required for rendering:
-
-```php
-protected function getSliceMap(): array
-{
-    return [
-         HeroSliceInterface::TYPE => [
-            'blockName' => HeroSliceInterface::BLOCK_NAME,
-            'attributes' => HeroSliceInterface::DEFAULT,
-            'heroWithButton' => [
-                'attributes' => HeroSliceInterface::HEROWITHBUTTON,
-            ]
-        ],
-        ButtonSliceInterface::TYPE => [
-            'blockName' => ButtonSliceInterface::BLOCK_NAME,
-            'attributes' => ButtonSliceInterface::ATTRIBUTES
-        ],
-        // Other slice types...
-    ];
-}
-```
 #### `getAttributesForSlice`
 
 Get attributes for a given slice.
@@ -210,74 +181,75 @@ protected function setVariation(string $variation, $childBlock): void
   - `setSliceAttributes()` sets attributes on child blocks based on slice data.
   - `setVariation()` set the variation name of a block based on the slice's variation property
 
-## Slug ViewModel
-### Methods 
-#### `getSlug`
+## SliceMap ViewModel
 
-This method retrieves the last part of the current URL, which can be used as a slug for identifying content:
+#### `getSliceMap`
+
+This method maps slice types to their corresponding block names and attributes required for rendering:
 
 ```php
-public function getSlug(): string
+public function getSliceMap(): array
 {
-    $currentUrl = $this->http->getServer('REQUEST_URI');
-    $parts = explode('/', trim($currentUrl, '/'));
-    return end($parts);
+    return [
+         HeroSliceInterface::TYPE => [
+            'blockName' => HeroSliceInterface::BLOCK_NAME,
+            'attributes' => HeroSliceInterface::DEFAULT,
+            'heroWithButton' => [
+                'attributes' => HeroSliceInterface::HEROWITHBUTTON,
+            ]
+        ],
+        ButtonSliceInterface::TYPE => [
+            'blockName' => ButtonSliceInterface::BLOCK_NAME,
+            'attributes' => ButtonSliceInterface::ATTRIBUTES
+        ],
+        // Other slice types...
+    ];
 }
 ```
 
-## Title ViewModel
-### Methods 
-#### `getTitle`
 
-This method retrieves the page title with the Prismic API: 
 
-```php
-public function getTitle() :string
-{
-    // Get the Prismic API instance from the API model
-    $api = $this->apiModel->getApi();
-    // Get the slug
-    $slug = $this->slugModel->getSlug();
-
-    // Fetch the document from the Prismic API using the slug
-    $document = $api->getByUID('page', $slug);
-    return $document->data->title[0]->text; // Return page title
-}
-```
 ## Layout XML
 
 The following XML configuration defines the layout for integrating Prismic content into a Magento page. This file includes references to CSS, blocks for rendering various Prismic slices, and arguments for necessary ViewModel classes.
 
 ### Head Section
 
-The `<head>` section includes a reference to a CSS file and sets a default title. The CSS gets generated with Tailwind. The title gets replaced with the title retrieved form Prismic:
-
+The `<head>` section includes a reference to a CSS file. The CSS gets generated with Tailwind. 
 ```xml
 <head>
     <css src="Marleen_PrismicIntegration::css/output.css" />
-    <title>Your Default Title</title>
 </head>
 ```
 
 ### Body Section
 
-The `<body>` section defines the main container and includes blocks for rendering Prismic content slices. Each block references a template file and includes arguments for ViewModel classes.
+The `<body>` section defines the main container and includes the header usps and the blocks for rendering Prismic content slices. Each block references a template file and includes arguments for ViewModel classes.
 
 ```xml
 <body>
+    <referenceContainer name="page.wrapper">
+        <block name="header.usps" template="Marleen_PrismicIntegration::header/usps.phtml" before="header.content">
+            <arguments>
+                <argument name="uspsModel" xsi:type="object">\Marleen\PrismicIntegration\ViewModel\Usps</argument>
+            </arguments>
+        </block>
+    </referenceContainer>
     <referenceContainer name="main">
+        <block name="page.title" class="Elgentos\PrismicIO\Block\Layout\PageTitle">
+            <block class="Elgentos\PrismicIO\Block\Dom\Text" template="data.title"/>
+        </block>
         <block name="prismic.content" template="Marleen_PrismicIntegration::prismic.phtml">
             <arguments>
                 <argument xsi:type="object" name="prismicModel">\Marleen\PrismicIntegration\ViewModel\Prismic</argument>
-                <argument xsi:type="object" name="slug">\Marleen\PrismicIntegration\ViewModel\Slug</argument>
-                <argument xsi:type="object" name="apiModel">\Marleen\PrismicIntegration\ViewModel\Api</argument>
+                <argument xsi:type="object" name="documentModel">\Marleen\PrismicIntegration\ViewModel\Document</argument>
             </arguments>
             <block name="slices.hero" template="Marleen_PrismicIntegration::slices/hero.phtml"/>
             <block name="slices.button" template="Marleen_PrismicIntegration::slices/button.phtml"/>
             <block name="slices.cta" template="Marleen_PrismicIntegration::slices/cta.phtml"/>
             <block name="slices.reviews" template="Marleen_PrismicIntegration::slices/reviews.phtml">
                 <arguments>
-                    <argument xsi:type="object" name="reviewsModel">\Marleen\PrismicIntegration\ViewModel\Reviews</argument>
+                    <argument xsi:type="object" name="customTypeModel">\Marleen\PrismicIntegration\ViewModel\CustomType</argument>
                     <argument xsi:type="object" name="linkResolver">\Marleen\PrismicIntegration\ViewModel\LinkResolver</argument>
                     <argument xsi:type="object" name="htmlSerializer">\Marleen\PrismicIntegration\ViewModel\HtmlSerializer</argument>
                 </arguments>
@@ -310,7 +282,7 @@ The `<body>` section defines the main container and includes blocks for renderin
 - **Purpose**: The layout XML file configures the structure and content rendering for a Magento page using Prismic slices.
 - **Sections**:
   - **Head**: Includes CSS and sets the default title.
-  - **Body**: Contains blocks for rendering different Prismic slices, with each block referencing specific templates and passing necessary ViewModel arguments.
+  - **Body**: Contains blocks for rendering different Prismic slices and the header usps, with each block referencing specific templates and passing necessary ViewModel arguments.
 - **Key Blocks**:
   - `prismic.content`: Main block for Prismic content.
   - `slices.hero`: Renders hero slices.
@@ -327,51 +299,41 @@ The following PHP template file is responsible for fetching content from the Pri
 
 ### Explanation
 
-1. **Variable Declarations**: The template starts with variable declarations for the block and the ViewModel instances (`Api`, `Prismic`, and `Slug`).
+1. **Variable Declarations**: The template starts with variable declarations for the block and the ViewModel instances (`Template`, `Prismic`, and `Document`).
 
-    ```php
-    /**
-     * @var $block \Magento\Framework\View\Element\Template
-     * @var $apiModel \Marleen\PrismicIntegration\ViewModel\Api
-     * @var $prismicModel \Marleen\PrismicIntegration\ViewModel\Prismic
-     * @var $slugModel \Marleen\PrismicIntegration\ViewModel\Slug
-     */
-    ```
+```php
+/**
+* @var $block \Magento\Framework\View\Element\Template
+* @var $prismicModel \Marleen\PrismicIntegration\ViewModel\Prismic
+* @var $documentModel \Marleen\PrismicIntegration\ViewModel\Document
+*/
+```
 
-2. **Retrieve Prismic API Model**: The Prismic API model is retrieved from the block's data, and an instance of the Prismic API is obtained.
+2. **Fetch Document**: The document is fetched from Elgentos module
 
-    ```php
-    $apiModel = $block->getData('apiModel');
-    $api = $apiModel->getApi();
-    ```
+```php
+// Get documentModel
+$documentModel = $block->getData('documentModel');
+// Get document from Elgentos module
+$document = $documentModel->getDocument();
+```
 
-3. **Retrieve Slug Model**: The Slug model is retrieved from the block's data, and the slug is obtained.
+5. **Display Slices**: The slices are displayed using the `displaySlices` method from the [Prismic ViewModel](#prismic-viewmodel).
 
-    ```php
-    $slugModel = $block->getData('slug');
-    $slug = $slugModel->getSlug();
-    ```
-
-4. **Fetch Document**: The document is fetched from the Prismic API using the slug. Slices are extracted from the document data if available.
-
-    ```php
-    $document = $api->getByUID('page', $slug);
+```php
+if ($document !== null) {
+    // Get slices from document
     $slices = $document->data->slices ?? [];
-    ```
-
-5. **Display Slices**: The Prismic model is retrieved from the block's data, and the slices are displayed using the `displaySlices` method from the [Prismic ViewModel](#prismic-viewmodel).
-
-    ```php
     $prismicModel = $block->getData('prismicModel');
+    // Display the slices using the Prismic model's displaySlices method
     echo $prismicModel->displaySlices($slices, $block);
-    ```
+}
+```
 
 ### Summary
 
-- **Purpose**: This template fetches content slices from the Prismic CMS and renders them within a Magento storefront using ViewModel classes.
+- **Purpose**: This template fetches content slices from Prismic and renders them within a Magento storefront using ViewModel classes.
 - **Key Steps**:
-  - Retrieve the Prismic API model and obtain an API instance.
-  - Retrieve the Slug model and obtain the slug.
   - Fetch the document from the Prismic API using the slug.
   - Extract slices from the document data.
   - Display the slices using the `displaySlices` method of the Prismic model.
@@ -428,6 +390,52 @@ if (!empty($background->url) && !empty($text)):
     </div>
 </section>
 ```
+## CustomType ViewModel
+
+ViewModel to fetch custom types from Prismic by ID or type
+
+### `getByID`
+```php
+public function getByID($ids): \stdClass
+{
+    $api = $this->api->getApi();
+    return $api->getByIDs($ids);
+}
+```
+### `getByType`
+```php
+public function getByType($type): \stdClass
+{
+    $api = $this->api->getApi();
+    return $api->query(Predicates::at('document.type', $type));
+}
+```
+
+## Usps ViewModel
+
+#### `getUsps`
+Retrieves the header usps
+
+```php
+public function getUsps() : ?array
+{
+    // Fetch header usps from Prismic
+    $document = $this->customType->getByType('message_bar');
+    // Sort usps messages in an array
+    $usps = [];
+    if (isset($document->results[0]->data->messages) && !empty($document->results[0]->data->messages)) {
+        foreach ($document->results[0]->data->messages as $message) {
+            if (isset($message)) {
+                $usps[] = $message;
+            }
+        }
+        return $usps;
+    } else {
+        return null;
+    }
+}
+```
+
     
 ## Contributing
 [Kasper Beljaars](https://github.com/KasperOfzeau)

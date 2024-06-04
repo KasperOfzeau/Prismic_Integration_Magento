@@ -1,0 +1,14 @@
+<?php
+/** @var \Magento\Framework\View\Element\Template $block */
+/** @var \Magento\Framework\Escaper $escaper */
+/** @var \Marleen\PrismicIntegration\ViewModel\Usps $uspsModel */
+$uspsModel = $block->getData('uspsModel');
+$usps = $uspsModel->getUsps();
+?>
+<?php if ($usps !== null && isset($usps)): ?>
+    <ul class="header-usps">
+        <?php foreach ($usps as $usp): ?>
+            <li class="header-usps__item"><?= $escaper->escapeHtml($usp->message) ?></li>
+        <?php endforeach; ?>
+    </ul>
+<?php endif; ?>

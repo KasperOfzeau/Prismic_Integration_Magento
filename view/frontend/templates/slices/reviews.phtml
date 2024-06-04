@@ -3,7 +3,7 @@ use Prismic\Dom\RichText;
 
 /**
  * @var $block \Magento\Framework\View\Element\Template
- * @var $reviewsModel \Marleen\PrismicIntegration\ViewModel\Reviews
+ * @var $customTypeModel \Marleen\PrismicIntegration\ViewModel\CustomType
  * @var $linkResolver \Marleen\PrismicIntegration\ViewModel\LinkResolver
  * @var $htmlSerializerModel \Marleen\PrismicIntegration\ViewModel\HtmlSerializer
  * @var $escaper \Magento\Framework\Escaper
@@ -15,8 +15,8 @@ $title = $sliceBlock->getTitle();
 $backgroundImage = $sliceBlock->getBackgroundImage();
 $reviewsIds = $sliceBlock->getReviews();
 
-$reviewsModel = $block->getData('reviewsModel');
-$reviews = $reviewsModel->getReviews($reviewsIds);
+$customTypeModel = $block->getData('customTypeModel');
+$reviews = $customTypeModel->getByID($reviewsIds);
 
 $linkResolver = $block->getData("linkResolver");
 
